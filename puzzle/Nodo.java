@@ -5,17 +5,12 @@ public class Nodo {
 	public Nodo padre;
 	public int[][] matriz;
 	
-	// Blank tile cordinates
 	public int x, y;
-	
-	// Number of misplaced tiles
 	public int costo;
-	
-	// The number of moves so far
 	public int nivel;
 	
-	public Nodo(int[][] matrix, int x, int y, int newX, int newY, int level, Nodo parent) {
-		this.padre = parent;
+	public Nodo(int[][] matrix, int x, int y, int newX, int newY, int nivel, Nodo padre) {
+		this.padre = padre;
 		this.matriz = new int[matrix.length][];
 		for (int i = 0; i < matrix.length; i++) {
 			this.matriz[i] = matrix[i].clone();
@@ -27,7 +22,7 @@ public class Nodo {
 		this.matriz[x][y]       = this.matriz[x][y] - this.matriz[newX][newY];
 		
 		this.costo = Integer.MAX_VALUE;
-		this.nivel = level;
+		this.nivel = nivel;
 		this.x = newX;
 		this.y = newY;
 	}
