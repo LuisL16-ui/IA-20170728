@@ -10,12 +10,24 @@ import seaborn as sns
 
 # Cargar y preparar datos
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
+x_train = x_train.reshape(-1, 28, 28, 1) / 255.0
+x_test = x_test.reshape(-1, 28, 28, 1) / 255.0
 
-# Modelo
+# modelo secuencial de Keras para clasificación de imágenes con CNN
 model = models.Sequential([
-    layers.Flatten(input_shape=(28, 28)),
-    layers.Dense(128, activation='relu'),
+    # Capa convolucional: 32 filtros de 3x3
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    # Capa de max pooling: reduce la dimensionalidad de la imagen
+    layers.MaxPooling2D((2, 2)),
+    # Segunda capa convolucional
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    # Segunda capa de max pooling
+    layers.MaxPooling2D((2, 2)),
+    # Aplana la salida 2D a un vector 1D para conectarla a las capas densas
+    layers.Flatten(),
+    # Capa densa (totalmente conectada)
+    layers.Dense(64, activation='relu'),
+    # Capa de salida: 10 neuronas (una por clase)
     layers.Dense(10, activation='softmax')
 ])
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -41,11 +53,6 @@ def graficar_matriz_confusion():
 # Tabla con conteo
 def mostrar_cantidad_imagenes():
     conteo = [np.sum(y_test == i) for i in range(10)]
-    df = pd.DataFrame({
-        'Número': list(range(10)),
-        'Cantidad de Imágenes': conteo
-    })
-
     top = tk.Toplevel()
     top.title("Cantidad de imágenes por número")
     tree = ttk.Treeview(top, columns=("Número", "Cantidad"), show='headings')
@@ -57,7 +64,7 @@ def mostrar_cantidad_imagenes():
 
 # Interfaz
 ventana = tk.Tk()
-ventana.title("MNIST - Análisis con Gráficas")
+ventana.title("MNIST - Análisis con CNN")
 ventana.geometry("400x200")
 
 btn1 = tk.Button(ventana, text="Matriz de Confusión", command=graficar_matriz_confusion, height=2)
