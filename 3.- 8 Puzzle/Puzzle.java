@@ -1,5 +1,4 @@
 package puzzle;
-
 import java.util.*;
 
 public class Puzzle {
@@ -25,7 +24,7 @@ public class Puzzle {
                 System.out.println("Solución encontrada en " + nodo.nivel + " movimientos!");
                 return;
             }
-            for (int i = 0; i < 4; i++) { 
+            for (int i = 0; i < 4; i++) {
                 int nuevoX = nodo.x + fila[i];
                 int nuevoY = nodo.y + columna[i];
                 if (esSeguro(nuevoX, nuevoY)) {
@@ -41,7 +40,6 @@ public class Puzzle {
         System.out.println("No se encontró una solución.");
     }
 
-    // Implementación del algoritmo BFS
     public void breadthFirstSearch(int[][] inicial, int[][] objetivo, int x, int y) {
         Queue<Nodo> queue = new LinkedList<>();
         Set<String> visitados = new HashSet<>();
@@ -49,38 +47,29 @@ public class Puzzle {
         queue.add(raiz);
         visitados.add(Arrays.deepToString(inicial));
 
-        // Mientras la cola no esté vacía
         while (!queue.isEmpty()) {
-            // Sacar el primer nodo de la cola
             Nodo nodo = queue.poll();
-            // Si el costo del nodo actual es 0, se ha encontrado la solución
             if (calcularCosto(nodo.matriz, objetivo) == 0) {
-            // Imprimir el camino desde el nodo raíz hasta el nodo actual
-            imprimirCamino(nodo);
-            System.out.println("Solución encontrada en " + nodo.nivel + " movimientos!");
-            return;
+                imprimirCamino(nodo);
+                System.out.println("Solución encontrada en " + nodo.nivel + " movimientos!");
+                return;
             }
-            // Explorar los 4 movimientos posibles (Abajo, Izquierda, Arriba, Derecha)
             for (int i = 0; i < 4; i++) {
-            int nuevoX = nodo.x + fila[i];
-            int nuevoY = nodo.y + columna[i];
-            // Verificar si la nueva posición es segura (dentro de los límites del tablero)
-            if (esSeguro(nuevoX, nuevoY)) {
-                // Crear un nuevo nodo hijo con la nueva posición
-                Nodo hijo = new Nodo(nodo.matriz, nodo.x, nodo.y, nuevoX, nuevoY, nodo.nivel + 1, nodo);
-                String estado = Arrays.deepToString(hijo.matriz);
-                // Si el estado del hijo no ha sido visitado, agregarlo a la cola y marcarlo como visitado
-                if (!visitados.contains(estado)) {
-                queue.add(hijo);
-                visitados.add(estado);
+                int nuevoX = nodo.x + fila[i];
+                int nuevoY = nodo.y + columna[i];
+                if (esSeguro(nuevoX, nuevoY)) {
+                    Nodo hijo = new Nodo(nodo.matriz, nodo.x, nodo.y, nuevoX, nuevoY, nodo.nivel + 1, nodo);
+                    String estado = Arrays.deepToString(hijo.matriz);
+                    if (!visitados.contains(estado)) {
+                        queue.add(hijo);
+                        visitados.add(estado);
+                    }
                 }
-            }
             }
         }
         System.out.println("No se encontró una solución.");
     }
 
-    // Implementación del algoritmo de Costo Uniforme
     public void uniformCostSearch(int[][] inicial, int[][] objetivo, int x, int y) {
         PriorityQueue<Nodo> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.nivel));
         Set<String> visitados = new HashSet<>();
@@ -88,32 +77,24 @@ public class Puzzle {
         pq.add(raiz);
         visitados.add(Arrays.deepToString(inicial));
 
-        // Mientras la cola de prioridad no esté vacía
         while (!pq.isEmpty()) {
-            // Sacar el nodo con el menor costo (nivel) de la cola de prioridad
             Nodo nodo = pq.poll();
-            // Si el costo del nodo actual es 0, se ha encontrado la solución
             if (calcularCosto(nodo.matriz, objetivo) == 0) {
-            // Imprimir el camino desde el nodo raíz hasta el nodo actual
-            imprimirCamino(nodo);
-            System.out.println("Solución encontrada en " + nodo.nivel + " movimientos!");
-            return;
+                imprimirCamino(nodo);
+                System.out.println("Solución encontrada en " + nodo.nivel + " movimientos!");
+                return;
             }
-            // Explorar los 4 movimientos posibles (Abajo, Izquierda, Arriba, Derecha)
             for (int i = 0; i < 4; i++) {
-            int nuevoX = nodo.x + fila[i];
-            int nuevoY = nodo.y + columna[i];
-            // Verificar si la nueva posición es segura (dentro de los límites del tablero)
-            if (esSeguro(nuevoX, nuevoY)) {
-                // Crear un nuevo nodo hijo con la nueva posición
-                Nodo hijo = new Nodo(nodo.matriz, nodo.x, nodo.y, nuevoX, nuevoY, nodo.nivel + 1, nodo);
-                String estado = Arrays.deepToString(hijo.matriz);
-                // Si el estado del hijo no ha sido visitado, agregarlo a la cola de prioridad y marcarlo como visitado
-                if (!visitados.contains(estado)) {
-                pq.add(hijo);
-                visitados.add(estado);
+                int nuevoX = nodo.x + fila[i];
+                int nuevoY = nodo.y + columna[i];
+                if (esSeguro(nuevoX, nuevoY)) {
+                    Nodo hijo = new Nodo(nodo.matriz, nodo.x, nodo.y, nuevoX, nuevoY, nodo.nivel + 1, nodo);
+                    String estado = Arrays.deepToString(hijo.matriz);
+                    if (!visitados.contains(estado)) {
+                        pq.add(hijo);
+                        visitados.add(estado);
+                    }
                 }
-            }
             }
         }
         System.out.println("No se encontró una solución.");
@@ -133,6 +114,55 @@ public class Puzzle {
             }
         }
         return contador;
+    }
+
+    public void aStarSearch(int[][] inicial, int[][] objetivo, int x, int y) {
+        PriorityQueue<Nodo> pq = new PriorityQueue<>(Comparator.comparingInt(n -> n.nivel + heuristicaManhattan(n.matriz, objetivo)));
+        Set<String> visitados = new HashSet<>();
+        Nodo raiz = new Nodo(inicial, x, y, x, y, 0, null);
+        pq.add(raiz);
+        visitados.add(Arrays.deepToString(inicial));
+
+        while (!pq.isEmpty()) {
+            Nodo nodo = pq.poll();
+            if (calcularCosto(nodo.matriz, objetivo) == 0) {
+                imprimirCamino(nodo);
+                System.out.println("Solución encontrada en " + nodo.nivel + " movimientos!");
+                return;
+            }
+            for (int i = 0; i < 4; i++) {
+                int nuevoX = nodo.x + fila[i];
+                int nuevoY = nodo.y + columna[i];
+                if (esSeguro(nuevoX, nuevoY)) {
+                    Nodo hijo = new Nodo(nodo.matriz, nodo.x, nodo.y, nuevoX, nuevoY, nodo.nivel + 1, nodo);
+                    String estado = Arrays.deepToString(hijo.matriz);
+                    if (!visitados.contains(estado)) {
+                        pq.add(hijo);
+                        visitados.add(estado);
+                    }
+                }
+            }
+        }
+        System.out.println("No se encontró una solución.");
+    }
+
+    public int heuristicaManhattan(int[][] actual, int[][] objetivo) {
+        int distancia = 0;
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                int valor = actual[i][j];
+                if (valor != 0) {
+                    for (int x = 0; x < dimension; x++) {
+                        for (int y = 0; y < dimension; y++) {
+                            if (objetivo[x][y] == valor) {
+                                distancia += Math.abs(i - x) + Math.abs(j - y);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return distancia;
     }
 
     public void imprimirCamino(Nodo raiz) {
@@ -165,21 +195,23 @@ public class Puzzle {
             {7, 8, 0}
         };
         int x = 1, y = 0;
-        
+
         Puzzle puzzle = new Puzzle();
         Scanner scanner = new Scanner(System.in);
-        
+
         System.out.println("Seleccione el algoritmo de búsqueda:");
         System.out.println("1. DFS");
         System.out.println("2. BFS");
         System.out.println("3. Costo Uniforme");
+        System.out.println("4. A* (Manhattan)");
         System.out.print("Opción: ");
         int opcion = scanner.nextInt();
-        
+
         switch (opcion) {
             case 1 -> puzzle.depthFirstSearch(inicial, objetivo, x, y);
             case 2 -> puzzle.breadthFirstSearch(inicial, objetivo, x, y);
             case 3 -> puzzle.uniformCostSearch(inicial, objetivo, x, y);
+            case 4 -> puzzle.aStarSearch(inicial, objetivo, x, y);
             default -> System.out.println("Opción no válida");
         }
     }
